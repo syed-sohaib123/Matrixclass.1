@@ -1,35 +1,58 @@
-public class IdWiseSumNotHashmap {
+import java.util.Scanner;
+import java.io.File;
+
+class BSCS_EVE_B_SalesTotalNoHM {
     public static void main(String[] args) {
+        
+        File f1 = new File("c:\\temp\\SalesEVESession.txt");
+        
+        String[] productIds = new String[100]; 
+        double[] totals = new double[100];
+        int uniqueCount = 0;
 
-        int[] ids     = {101, 102, 101, 103, 102, 101, 103};
-        int[] amounts = {500, 300, 200, 400, 100, 300, 150};
+        try (Scanner inp = new Scanner(f1)) {
+           
+            if (inp.hasNextLine()) {
+                System.out.println("Header: " + inp.nextLine());
+            }
 
-        int[] uniqueIds  = new int[ids.length];
-        int[] totalSum   = new int[ids.length];
-        int   count      = 0;
+            while (inp.hasNextLine()) {
+                String dl = inp.nextLine();
+                if (dl.trim().isEmpty()) continue;
 
-        for (int i = 0; i < ids.length; i++) {
-            boolean found = false;
+                String[] parts = dl.split("\t");
+                
+                String currentId = parts[1]; 
+                double uPrice = Double.parseDouble(parts[2]);
+                double qty = Double.parseDouble(parts[3]);
+                double lineTotal = qty * uPrice;
 
-            for (int j = 0; j < count; j++) {
-                if (uniqueIds[j] == ids[i]) {
-                    totalSum[j] += amounts[i];  
-                    found = true;
-                    break;
+                int foundIndex = -1;
+                for (int i = 0; i < uniqueCount; i++) {
+                    if (productIds[i].equals(currentId)) {
+                        foundIndex = i;
+                        break;
+                    }
+                }
+
+                if (foundIndex != -1) {
+                   
+                    totals[foundIndex] += lineTotal;
+                } else {
+                    
+                    productIds[uniqueCount] = currentId;
+                    totals[uniqueCount] = lineTotal;
+                    uniqueCount++;
                 }
             }
-
-            if (!found) {
-                uniqueIds[count] = ids[i];
-                totalSum[count]  = amounts[i];
-                count++;
-            }
+        } catch (Exception e) {
+            System.out.println("Error processing file: " + e.getMessage());
         }
 
-        System.out.println("ID-Wise Sum:");
-        System.out.println("------------");
-        for (int i = 0; i < count; i++) {
-            System.out.println("ID " + uniqueIds[i] + " = " + totalSum[i]);
+       
+        System.out.println("\n--- ID Wise Totals ---");
+        for (int i = 0; i < uniqueCount; i++) {
+            System.out.println("ID: " + productIds[i] + " | Total: " + totals[i]);
         }
     }
 }
